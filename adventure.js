@@ -7,16 +7,6 @@ const $=q=>document.querySelector(q);
 const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const load=k=>JSON.parse(localStorage.getItem(k)||'null');
 
-/*  1.  reload user (same key creator uses)  */
-const user=load('user');
-const activeCharId=load('activeCharId');        // keep last-selected char
-if (!user || !user.token) {
-  location.href = 'creator.html';          // already present
-} else {
-  $('#game').hidden = false;               // show game area
-  $('#loginPrompt').hidden = true;         // <-- ADD THIS
-  init();                                    // load characters
-}
 const sb={
   get:(url,tk)=>fetch(url,{headers:{apikey:SUPA_ANON,Authorization:`Bearer ${tk}`}}).then(r=>r.json())
 };
@@ -24,16 +14,19 @@ const sb={
 /*  logout  */
 $('#logout').onclick=()=>{localStorage.clear(); location.href='index.html';};
 
-/*  init  */
-(async()=>{
+/*  =====  functions  =====  */
+async function init(){
   const list=await sb.get(`${SUPA_URL}/rest/v1/characters?owner=eq.${user.id}&select=*`,user.token);
   renderSidebar(list);
-})();
-
-/*  sidebar  */
+}
 function renderSidebar(list){
-  const box=$('#charList'); box.innerHTML=''; list.forEach(c=>{
-    const d=document.createElement('div'); d.textContent=`${c.name} (${c.species} ${c.class})`; d.style.cursor='pointer'; d.onclick=()=>{ store('activeCharId',c.id); location.reload(); }; box.appendChild(d);
+  const box=$('#charList'); box.innerHTML='';
+  list.forEach(c=>{
+    const d=document.createElement('div');
+    d.textContent=`${c.name} (${c.species} ${c.class})`;
+    d.style.cursor='pointer';
+    d.onclick=()=>{ store('activeCharId',c.id); location.reload(); };
+    box.appendChild(d);
   });
 }
 $('#newChar').onclick=()=>location.href='creator.html';
@@ -50,6 +43,7 @@ $('#adv').onclick=()=>{const a=Math.floor(Math.random()*20)+1,b=Math.floor(Math.
 $('#dis').onclick=()=>{const a=Math.floor(Math.random()*20)+1,b=Math.floor(Math.random()*20)+1; hist.push(`d20 Dis ${a},${b} → ${Math.min(a,b)}`); $('#rollHistory').textContent=hist.slice(-10).reverse().join('\n');};
 
 /*  chat  */
+const activeCharId=load('activeCharId');
 let chatLog=load('chat_'+activeCharId)||[];
 function renderChat(){
   const box=$('#chat'); box.innerHTML='';
@@ -103,4 +97,14 @@ async function askDM(q){
     const json=await res.json(); const reply=json.choices[0].message.content;
     addChat('dm','DM',reply);
   }catch(e){addChat('dm','DM','(The mists swirl… you cannot reach the DM right now.)');}
+}
+
+/*  =====  login gate  (runs AFTER everything is defined)  =====  */
+const user=load('user');
+if (!user || !user.token) {
+  location.href='creator.html';
+} else {
+  $('#game').hidden=false;
+  $('#loginPrompt').hidden=true;
+  init();
 }
