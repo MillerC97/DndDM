@@ -1,0 +1,13 @@
+:root{
+  --bg:#111;
+  --fg:#eee;
+  --accent:#0ff;
+  font-family:system-ui, sans-serif;
+}
+body{margin:0;background:var(--bg);color:var(--fg);padding:1rem}
+header{display:flex;justify-content:space-between;align-items:center}
+button{background:var(--accent);color:#000;border:none;padding:.4rem .8rem;border-radius:4px;cursor:pointer}
+section{border:1px solid #333;padding:1rem;margin-bottom:1rem;border-radius:6px}
+#charBlock{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.5rem}
+#chat{height:200px;overflow-y:auto;border:1px solid #444;padding:.5rem;margin-bottom:.5rem;background:#000}
+input,textarea{width:100%;padding:.5rem;background:#222;color:var(--fg);border:1px solid #444;border-radius:4px}

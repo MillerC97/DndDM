@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Pocket DM</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiUG9ja2V0RE0iLCJzaG9ydF9uYW1lIjoiRE0iLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUifQ=="/>
+</head>
+<body>
+<header>
+  <h1>Pocket DM</h1>
+  <button id="reloadChar">↻ Reload Character</button>
+</header>
+
+<main>
+  <!-- CHARACTER SHEET -->
+  <section id="charSheet">
+    <h2>Character</h2>
+    <div id="charBlock"></div>
+    <label>HP <input id="hp" type="number"/></label>
+    <label>Gold <input id="gold" type="number" step="0.01"/></label>
+    <button id="saveChar">Save</button>
+  </section>
+
+  <!-- CAMPAIGN LOG -->
+  <section id="log">
+    <h2>Campaign Log</h2>
+    <textarea id="notes" rows="6" placeholder="What happened this session?"></textarea>
+    <button id="saveNotes">Save Notes</button>
+  </section>
+
+  <!-- AI DM -->
+  <section id="dm">
+    <h2>Ask the DM</h2>
+    <div id="chat"></div>
+    <input id="ask" placeholder="What do I see?"/>
+    <button id="send">Send</button>
+  </section>
+</main>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
