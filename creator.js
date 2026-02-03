@@ -13,7 +13,9 @@ const sb={
       headers:h,
       body:JSON.stringify(body)
     });
-    if(!r.ok){const e=await r.json(); throw e;}
+    const text=await r.text();
+    console.log('SB POST',path,body,r.status,text);
+    if(!r.ok){alert(`$${r.status}: ${text}`); throw new Error(text);}
     return r.json();
   }
 };
