@@ -84,26 +84,52 @@ function blankChar(){
 }
 
 /*  preload Alder if no chars exist =============================== */
+/*  preload Alder with FULL sheet ================================= */
 async function seedAlder(){
   if(CHARS.length)return;
-  const raw=await fetch(`https://character-service.dndbeyond.com/character/v5/character/${DEFAULT_CHAR_ID}`);
-  const d=(await raw.json()).data;
+  const raw = await fetch(`https://character-service.dndbeyond.com/character/v5/character/${DEFAULT_CHAR_ID}`);
+  const data = await raw.json();
+  const c = data.data;
+
   const stats={};
-  ['str','dex','con','int','wis','cha'].forEach((s,i)=>stats[s]=d.stats[i].value);
+  ['str','dex','con','int','wis','cha'].forEach((s,i)=>stats[s]=c.stats[i].value);
+
   const ch={
     id:crypto.randomUUID(),
-    name:d.name,
-    race:d.race.baseName,
-    class:d.classes[0].definition.name,
-    level:d.classes[0].level,
-    hp:{max:d.baseHitPoints,current:d.baseHitPoints,temp:0},
-    ac:d.armorClass,
+    name:c.name,
+    race:c.race.baseName,
+    class:c.classes[0].definition.name,
+    level:c.classes[0].level,
+    hp:{max:c.baseHitPoints,current:c.baseHitPoints,temp:0},
+    ac:c.armorClass,
     initiative:mod(stats.dex),
     speed:30,
     stats,
-    profBonus:Math.floor((d.classes[0].level-1)/4+2),
-    skills:{},saves:{},spells:[],inventory:[{name:'Gold',qty:0}]
+    profBonus:Math.floor((c.classes[0].level-1)/4+2),
+    skills:{},saves:{},spells:[],inventory:[],
+    fullBlob:c                                // <-- entire sheet for DM
   };
+
+  /* proficiencies */
+  const addProf=list=>list?.forEach(m=>{if(m.type==='proficiency'&&m.subType){ch.skills[m.subType]=true;}});
+  addProf(c.modifiers.race);
+  addProf(c.modifiers.class);
+  addProf(c.modifiers.background);
+  (c.choices?.class||[]).forEach(g=>g.options?.forEach(o=>addProf(o.options)));
+  (c.choices?.race||[]).forEach(g=>g.options?.forEach(o=>addProf(o.options)));
+
+  /* saving throws */
+  const saveMap={str:'strength-save',dex:'dexterity-save',con:'constitution-save',int:'intelligence-save',wis:'wisdom-save',cha:'charisma-save'};
+  Object.entries(saveMap).forEach(([short,long])=>{if(ch.skills[long]){ch.saves[short]=true; delete ch.skills[long];}});
+
+  /* inventory */
+  c.inventory.forEach(it=>{if(it.definition)ch.inventory.push({name:it.definition.name,qty:it.quantity||1});});
+  const gp=(c.currencies?.gp||0)+(c.currencies?.pp||0)*10+(c.currencies?.sp||0)*0.1+(c.currencies?.cp||0)*0.01;
+  if(gp)ch.inventory.push({name:'Gold',qty:gp});
+
+  /* spells */
+  ['prepared','race','class'].forEach(k=>c.spells[k]?.forEach(sp=>ch.spells.push(sp.definition.name)));
+
   CHARS.push(ch); saveChars(); ACTIVE_ID=ch.id; saveActive();
 }
 
@@ -310,10 +336,11 @@ function dmReactToAction(action){
   addChat('dm','DM','(The DM narrows their eyes…) What would you like to roll?');
 }
 
-/*  ask OpenRouter DM ============================================ */
+/*  ask OpenRouter DM with FULL sheet ============================= */
 async function askDM(question){
   const ch=active();
-  const prompt=`You are the DM of a solo D&D 5e game. The player is ${ch.name}, a level ${ch.level} ${ch.race} ${ch.class}. Answer briefly, in character, keep the tone of a fantasy tabletop DM. If the player asks for rules, give a quick ruling.`;
+  const sheetBlob=JSON.stringify(ch.fullBlob||{},null,2).slice(0,12_000); // trim if huge
+  const prompt=`You are the DM of a solo D&D 5e game. The player is ${ch.name}, a level ${ch.level} ${ch.race} ${ch.class}. Here is their complete D&D Beyond character sheet (every feature, spell, item, DC, passive score, etc.): ${sheetBlob}. Use any number or rule in that sheet when you adjudicate. Answer briefly, in character.`;
   const messages=[
     {role:'system',content:prompt},
     ...CHAT_LOG.filter(l=>l.type==='dm'||l.type==='action').slice(-6).map(l=>({role:l.from==='You'?'user':'assistant',content:l.text})),
