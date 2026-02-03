@@ -1,49 +1,53 @@
+/*  =====  adventure.js  =====  */
+
 const SUPA_URL='https://ddmomfyrychifhvxvihv.supabase.co';
 const SUPA_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkbW9tZnlyeWNoaWZodnh2aWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMzUwOTgsImV4cCI6MjA4NTcxMTA5OH0.KlR1nTiNOxGN0PyGWA1Tif9od0iSyhS_CjFuz3p4qPg';
 const OPEN_KEY='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';
 const $=q=>document.querySelector(q);
 const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const load=k=>JSON.parse(localStorage.getItem(k)||'null');
-const sb={get:(url,tk)=>fetch(url,{headers:{apikey:SUPA_ANON,Authorization:`Bearer ${tk}`}}).then(r=>r.json())};
 
-let user=load('user');
-let activeCharId=null;
-let chatLog=[];
+/*  1.  reload user (same key creator uses)  */
+const user=load('user');
+const activeCharId=load('activeCharId');        // keep last-selected char
+if (!user || !user.token) {
+  location.href='creator.html';                 // not logged in → kick to login
+}
 
-/* auth check */
-if(!user){$('#loginPrompt').hidden=false;}else{$('#game').hidden=false;init();}
-$('#logout').onclick=()=>{localStorage.clear();location.href='index.html';};
+const sb={
+  get:(url,tk)=>fetch(url,{headers:{apikey:SUPA_ANON,Authorization:`Bearer ${tk}`}}).then(r=>r.json())
+};
 
-async function init(){
+/*  logout  */
+$('#logout').onclick=()=>{localStorage.clear(); location.href='index.html';};
+
+/*  init  */
+(async()=>{
   const list=await sb.get(`${SUPA_URL}/rest/v1/characters?owner=eq.${user.id}&select=*`,user.token);
   renderSidebar(list);
-}
+})();
+
+/*  sidebar  */
 function renderSidebar(list){
-  const box=$('#charList'); box.innerHTML='';
-  list.forEach(c=>{
-    const d=document.createElement('div'); d.textContent=`${c.name} (${c.species} ${c.class})`; d.style.cursor='pointer';
-    d.onclick=()=>{activeCharId=c.id; store('activeCharId',c.id); loadChat(c);};
-    box.appendChild(d);
+  const box=$('#charList'); box.innerHTML=''; list.forEach(c=>{
+    const d=document.createElement('div'); d.textContent=`${c.name} (${c.species} ${c.class})`; d.style.cursor='pointer'; d.onclick=()=>{ store('activeCharId',c.id); location.reload(); }; box.appendChild(d);
   });
 }
 $('#newChar').onclick=()=>location.href='creator.html';
 
-/* dice */
+/*  dice  */
 const hist=[];
 $('#diceTray').onclick=e=>{
   if(!e.target.dataset.die)return;
-  const sides=+e.target.dataset.die; const r=Math.floor(Math.random()*sides)+1; logRoll(`d${sides} = ${r}`);
+  const r=Math.floor(Math.random()*e.target.dataset.die)+1;
+  hist.push(`d${e.target.dataset.die} = ${r}`);
+  $('#rollHistory').textContent=hist.slice(-10).reverse().join('\n');
 };
-$('#adv').onclick=()=>{const a=roll(20),b=roll(20); logRoll(`d20 Adv ${a},${b} → ${Math.max(a,b)}`);};
-$('#dis').onclick=()=>{const a=roll(20),b=roll(20); logRoll(`d20 Dis ${a},${b} → ${Math.min(a,b)}`);};
-function roll(sides){return Math.floor(Math.random()*sides)+1;}
-function logRoll(str){hist.push(str); $('#rollHistory').textContent=hist.slice(-10).reverse().join('\n');}
+$('#adv').onclick=()=>{const a=Math.floor(Math.random()*20)+1,b=Math.floor(Math.random()*20)+1; hist.push(`d20 Adv ${a},${b} → ${Math.max(a,b)}`); $('#rollHistory').textContent=hist.slice(-10).reverse().join('\n');};
+$('#dis').onclick=()=>{const a=Math.floor(Math.random()*20)+1,b=Math.floor(Math.random()*20)+1; hist.push(`d20 Dis ${a},${b} → ${Math.min(a,b)}`); $('#rollHistory').textContent=hist.slice(-10).reverse().join('\n');};
 
-/* chat */
-function loadChat(ch){
-  chatLog=load('chat_'+ch.id)||[];
-  renderChat();
-}
+/*  chat  */
+let chatLog=load('chat_'+activeCharId)||[];
 function renderChat(){
   const box=$('#chat'); box.innerHTML='';
   chatLog.forEach(l=>{
@@ -53,7 +57,9 @@ function renderChat(){
   box.scrollTop=1e9;
 }
 function addChat(type,from,text){
-  chatLog.push({type,from,text,ts:Date.now()}); store('chat_'+activeCharId,chatLog); renderChat();
+  chatLog.push({type,from,text,ts:Date.now()});
+  store('chat_'+activeCharId,chatLog);
+  renderChat();
 }
 $('#send').onclick=()=>{parseInput($('#chatInput').value); $('#chatInput').value='';};
 $('#chatInput').onkeyup=e=>{if(e.key==='Enter')parseInput($('#chatInput').value); $('#chatInput').value='';};
