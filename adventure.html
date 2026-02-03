@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Pocket Adventure</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="adventure.css"/>
+</head>
+<body>
+<header>
+  <h1>Adventure</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="creator.html">Creator</a>
+    <button id="logout">Log out</button>
+  </nav>
+</header>
+
+<main id="app">
+  <section id="loginPrompt">
+    <p>Please <a href="creator.html">log in</a> first.</p>
+  </section>
+
+  <section id="game" hidden>
+    <aside id="charSidebar">
+      <h3>Characters</h3>
+      <div id="charList"></div>
+      <button id="newChar">New</button>
+    </aside>
+
+    <article id="stage">
+      <div id="chat"></div>
+      <div id="inputLine">
+        <input id="chatInput" placeholder="/command , *action* , \"speech\" , PlayerName text"/>
+        <button id="send">Send</button>
+      </div>
+      <div id="diceTray">
+        <button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button>
+        <button data-die="10">d10</button><button data-die="12">d12</button><button data-die="20">d20</button>
+        <button id="adv">Adv</button><button id="dis">Dis</button>
+      </div>
+      <div id="rollHistory"></div>
+    </article>
+  </section>
+</main>
+
+<script src="adventure.js"></script>
+</body>
+</html>

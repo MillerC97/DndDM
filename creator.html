@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Pocket Creator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="creator.css"/>
+</head>
+<body>
+<header>
+  <h1>Character Creator</h1>
+  <a href="index.html">← Home</a>
+</header>
+
+<main id="app">
+  <!-- LOGIN -->
+  <section id="loginPage">
+    <h2>Log in</h2>
+    <input id="email" type="email" placeholder="E-mail"/>
+    <input id="pw" type="password" placeholder="Password"/>
+    <button id="loginBtn">Log in</button>
+    <button id="signupBtn">Create account</button>
+  </section>
+
+  <!-- BUILDER -->
+  <section id="builder" hidden>
+    <nav id="steps">
+      <button class="step active" data-page="species">Species</button>
+      <button class="step" data-page="class">Class</button>
+      <button class="step" data-page="abilities">Abilities</button>
+      <button class="step" data-page="equipment">Equipment</button>
+      <button class="step" data-page="finish">Finish</button>
+    </nav>
+
+    <div class="page" id="species">
+      <h3>Choose Species</h3>
+      <div class="grid" id="speciesGrid"></div>
+    </div>
+
+    <div class="page" id="class" hidden>
+      <h3>Choose Class</h3>
+      <div class="grid" id="classGrid"></div>
+    </div>
+
+    <div class="page" id="abilities" hidden>
+      <h3>Ability Scores</h3>
+      <button id="rollScores">4d6-drop-lowest × 6</button>
+      <div id="scoreBox"></div>
+      <div id="abilityGrid"></div>
+    </div>
+
+    <div class="page" id="equipment" hidden>
+      <h3>Pick Equipment</h3>
+      <div id="packs"></div>
+    </div>
+
+    <div class="page" id="finish" hidden>
+      <h3>Name your hero</h3>
+      <input id="charName" placeholder="Character name"/>
+      <button id="saveChar">Save & Play</button>
+    </div>
+  </section>
+</main>
+
+<script src="creator.js"></script>
+</body>
+</html>

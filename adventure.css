@@ -1,0 +1,18 @@
+:root{--bg:#111;--fg:#eee;--accent:#0ff;font-family:system-ui,sans-serif}
+body{margin:0;background:var(--bg);color:var(--fg);display:flex;flex-direction:column;height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:.5rem 1rem}
+nav a{margin-right:1rem;color:var(--accent)}
+main{flex:1;display:flex;overflow:hidden}
+#loginPrompt{display:grid;place-content:center;text-align:center;flex:1}
+#game{display:flex;flex:1}
+#charSidebar{width:220px;background:#1a1a1a;padding:.5rem;overflow-y:auto}
+#stage{display:flex;flex-direction:column;flex:1;padding:.5rem}
+#chat{flex:1;background:#000;border:1px solid #444;padding:.5rem;overflow-y:auto;margin-bottom:.5rem}
+#inputLine{display:flex;gap:.25rem}
+#chatInput{flex:1}
+#diceTray{display:flex;gap:.25rem;margin:.5rem 0}
+#rollHistory{height:100px;overflow-y:auto;background:#111;border:1px solid #444;padding:.25rem;font-size:.8rem}
+.dm{color:#c79bff}
+.action{color:#ffb86c}
+.npc{color:#50fa7b}
+.player{color:#8be9fd}

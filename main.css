@@ -1,0 +1,7 @@
+:root{--bg:#111;--fg:#eee;--accent:#0ff;font-family:system-ui,sans-serif}
+body{margin:0;background:var(--bg);color:var(--fg);padding:1rem}
+header{display:flex;justify-content:space-between;align-items:center}
+nav a{margin-left:1rem;color:var(--accent)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-top:2rem}
+.card{background:#222;border:1px solid #444;padding:2rem;border-radius:6px;text-align:center;text-decoration:none;color:var(--fg)}
+.card:hover{border-color:var(--accent)}

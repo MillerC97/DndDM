@@ -2,79 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>Pocket Creator</title>
+  <title>Pocket DM</title>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="main.css"/>
 </head>
 <body>
 <header>
-  <h1>Pocket Creator</h1>
-  <button id="logout" hidden>Log out</button>
+  <h1>Pocket DM</h1>
+  <nav>
+    <a href="creator.html">Create Character</a>
+    <a href="adventure.html">Adventure</a>
+  </nav>
 </header>
-
-<main id="app">
-  <!-- LOGIN -->
-  <section id="loginPage">
-    <h2>Log in</h2>
-    <input id="email" type="email" placeholder="E-mail"/>
-    <input id="pw" type="password" placeholder="Password"/>
-    <button id="loginBtn">Log in</button>
-    <button id="signupBtn">Create account</button>
-  </section>
-
-  <!-- BUILDER -->
-  <section id="builder" hidden>
-    <nav id="steps">
-      <button class="step active" data-page="species">Species</button>
-      <button class="step" data-page="class">Class</button>
-      <button class="step" data-page="abilities">Abilities</button>
-      <button class="step" data-page="equipment">Equipment</button>
-      <button class="step" data-page="finish">Finish</button>
-    </nav>
-
-    <!-- 1. SPECIES -->
-    <div class="page" id="species">
-      <h3>Choose Species</h3>
-      <div class="grid" id="speciesGrid"></div>
-    </div>
-
-    <!-- 2. CLASS -->
-    <div class="page" id="class" hidden>
-      <h3>Choose Class</h3>
-      <div class="grid" id="classGrid"></div>
-    </div>
-
-    <!-- 3. ABILITY SCORES -->
-    <div class="page" id="abilities" hidden>
-      <h3>Ability Scores</h3>
-      <button id="rollScores">4d6-drop-lowest × 6</button>
-      <div id="scoreBox"></div>
-      <p>Drag numbers onto the abilities you want.</p>
-      <div id="abilityGrid"></div>
-    </div>
-
-    <!-- 4. EQUIPMENT -->
-    <div class="page" id="equipment" hidden>
-      <h3>Pick Equipment</h3>
-      <div id="packs"></div>
-    </div>
-
-    <!-- 5. FINISH -->
-    <div class="page" id="finish" hidden>
-      <h3>Name your hero</h3>
-      <input id="charName" placeholder="Character name"/>
-      <button id="saveChar">Save & Play</button>
-    </div>
-  </section>
-
-  <!-- SHEET VIEWER -->
-  <section id="viewer" hidden>
-    <button id="backBuilder">← Builder</button>
-    <h2 id="vName"></h2>
-    <pre id="vSheet"></pre>
-  </section>
+<main>
+  <h2>Pick your door</h2>
+  <div class="cards">
+    <a class="card" href="creator.html">🧙‍♂️ Character Creator</a>
+    <a class="card" href="adventure.html">⚔️ Adventure / DM Chat</a>
+  </div>
 </main>
-
-<script type="module" src="creator.js"></script>
+<script src="main.js"></script>
 </body>
 </html>
