@@ -11,9 +11,12 @@ const load=k=>JSON.parse(localStorage.getItem(k)||'null');
 const user=load('user');
 const activeCharId=load('activeCharId');        // keep last-selected char
 if (!user || !user.token) {
-  location.href='creator.html';                 // not logged in → kick to login
+  location.href = 'creator.html';          // already present
+} else {
+  $('#game').hidden = false;               // show game area
+  $('#loginPrompt').hidden = true;         // <-- ADD THIS
+  init();                                    // load characters
 }
-
 const sb={
   get:(url,tk)=>fetch(url,{headers:{apikey:SUPA_ANON,Authorization:`Bearer ${tk}`}}).then(r=>r.json())
 };
