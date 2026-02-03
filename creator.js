@@ -5,10 +5,12 @@ const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const load=k=>JSON.parse(localStorage.getItem(k)||'null');
 
 const sb={
-  async post(path,body){
-    const r=await fetch(`${SUPA_URL}${path}`,{
-      method:'POST',
-      headers:{apikey:SUPA_ANON,'Content-Type':'application/json'},
+  async post(path,body,token=null){
+    const h={apikey:SUPA_ANON,'Content-Type':'application/json'};
+    if(token)h.Authorization=`Bearer ${token}`;
+    const r=await fetch(`${SUPA_URL}${path}`,
+    {method:'POST',
+      headers:h,
       body:JSON.stringify(body)
     });
     if(!r.ok){const e=await r.json(); throw e;}
@@ -108,6 +110,6 @@ $('#saveChar').onclick=async()=>{
     fullBlob:build
   };
   sheet.inventory.push({name:'Gold',qty:10});
-  await sb.post('/rest/v1/characters',sheet);
+  await sb.post('/rest/v1/characters',sheet, user.token);
   alert('Saved!'); location.href='adventure.html';
 };
