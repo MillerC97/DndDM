@@ -8,17 +8,26 @@ const sb={post:(url,body)=>fetch(url,{method:'POST',headers:{apikey:SUPA_ANON,'C
 let user=load('user');
 let build={species:'',class:'',scores:[],assigned:{str:null,dex:null,con:null,int:null,wis:null,cha:null},equipment:[],name:''};
 
-/* login */
+async function rpc(fn,body){
+  const r=await fetch(`${SUPA_URL}/rest/v1/rpc/${fn}`,{
+    method:'POST',
+    headers:{apikey:SUPA_ANON,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!r.ok){const e=await r.json(); throw e;}
+  return r.json();
+}
 async function login(em,pw){
-  const {data,session,error}=await sb.rpc('sign_in_with_password',{email:em,password:pw});
-  if(error){alert(error.message);return;}
-  user={id:data.user.id,email:data.user.email,token:session.access_token}; store('user',user);
-  $('#loginPage').hidden=true; $('#builder').hidden=false;
+  try{const res=await rpc('sign_in_with_password',{email:em,password:pw});
+        user={id:res.user.id,email:res.user.email,token:res.session.access_token}; store('user',user);
+        $('#loginPage').hidden=true; $('#builder').hidden=false;
+  }catch(e){alert(e.message||'Login failed');}
 }
 async function signup(em,pw){
-  const {error}=await sb.rpc('sign_up',{email:em,password:pw});
-  if(error){alert(error.message);return;}
-  alert('Check e-mail'); login(em,pw);
+  try{const res=await rpc('sign_up',{email:em,password:pw});
+        user={id:res.user.id,email:res.user.email,token:res.session.access_token}; store('user',user);
+        $('#loginPage').hidden=true; $('#builder').hidden=false;
+  }catch(e){alert(e.message||'Sign-up failed');}
 }
 $('#loginBtn').onclick=()=>login($('#email').value,$('#pw').value);
 $('#signupBtn').onclick=()=>signup($('#email').value,$('#pw').value);
