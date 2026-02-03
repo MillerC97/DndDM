@@ -3,32 +3,39 @@ const SUPA_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsIn
 const $=q=>document.querySelector(q);
 const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const load=k=>JSON.parse(localStorage.getItem(k)||'null');
-const sb={post:(url,body)=>fetch(url,{method:'POST',headers:{apikey:SUPA_ANON,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json()),rpc:(fn,p)=>sb.post(`${SUPA_URL}/rest/v1/rpc/${fn}`,p)};
+
+const sb={
+  async post(path,body){
+    const r=await fetch(`${SUPA_URL}${path}`,{
+      method:'POST',
+      headers:{apikey:SUPA_ANON,'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(!r.ok){const e=await r.json(); throw e;}
+    return r.json();
+  }
+};
 
 let user=load('user');
 let build={species:'',class:'',scores:[],assigned:{str:null,dex:null,con:null,int:null,wis:null,cha:null},equipment:[],name:''};
 
-async function rpc(fn,body){
-  const r=await fetch(`${SUPA_URL}/rest/v1/rpc/${fn}`,{
-    method:'POST',
-    headers:{apikey:SUPA_ANON,'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  if(!r.ok){const e=await r.json(); throw e;}
-  return r.json();
-}
 async function login(em,pw){
-  try{const res=await rpc('sign_in_with_password',{email:em,password:pw});
-        user={id:res.user.id,email:res.user.email,token:res.session.access_token}; store('user',user);
-        $('#loginPage').hidden=true; $('#builder').hidden=false;
+  try{
+    const res=await sb.post('/auth/v1/token?grant_type=password',{email:em,password:pw});
+    user={id:res.user.id,email:res.user.email,token:res.access_token};
+    store('user',user);
+    $('#loginPage').hidden=true; $('#builder').hidden=false;
   }catch(e){alert(e.message||'Login failed');}
 }
 async function signup(em,pw){
-  try{const res=await rpc('sign_up',{email:em,password:pw});
-        user={id:res.user.id,email:res.user.email,token:res.session.access_token}; store('user',user);
-        $('#loginPage').hidden=true; $('#builder').hidden=false;
+  try{
+    const res=await sb.post('/auth/v1/signup',{email:em,password:pw});
+    user={id:res.user.id,email:res.user.email,token:res.access_token};
+    store('user',user);
+    $('#loginPage').hidden=true; $('#builder').hidden=false;
   }catch(e){alert(e.message||'Sign-up failed');}
 }
+
 $('#loginBtn').onclick=()=>login($('#email').value,$('#pw').value);
 $('#signupBtn').onclick=()=>signup($('#email').value,$('#pw').value);
 if(user){$('#loginPage').hidden=true; $('#builder').hidden=false;}
@@ -101,6 +108,6 @@ $('#saveChar').onclick=async()=>{
     fullBlob:build
   };
   sheet.inventory.push({name:'Gold',qty:10});
-  await sb.post(`${SUPA_URL}/rest/v1/characters`,sheet);
+  await sb.post('/rest/v1/characters',sheet);
   alert('Saved!'); location.href='adventure.html';
 };
