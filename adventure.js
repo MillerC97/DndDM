@@ -99,12 +99,12 @@ async function askDM(q){
   }catch(e){addChat('dm','DM','(The mists swirl… you cannot reach the DM right now.)');}
 }
 
-/*  =====  login gate  (runs AFTER everything is defined)  =====  */
 const user=load('user');
 if (!user || !user.token) {
+  $('#loginPrompt').style.display='block';   // show banner ONLY if not logged in
   location.href='creator.html';
 } else {
   $('#game').hidden=false;
-  $('#loginPrompt').hidden=true;
+  $('#loginPrompt').hidden=true;             // hide banner
   init();
 }
